@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		05D238A8AD4211FE2263CD93 /* MarkdownPreviewSnippetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBCD174740B834C2DA908745 /* MarkdownPreviewSnippetView.swift */; };
 		2B3B7A1E48687FD6905FE269 /* MarkdownSnippetShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F18C21D8F018F895C61FD1 /* MarkdownSnippetShortcuts.swift */; };
+		380AE5AC496FBBCCF95ACE8C /* MarkdownRenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717A277617C0FF78236A22A2 /* MarkdownRenderView.swift */; };
 		444EBEBD24BF91F13E3CD73A /* MarkdownEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4608603E284680EC448C3EC5 /* MarkdownEditorView.swift */; };
 		4A3641A29ECB704BADF0CEDA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C903C5C6823E5B55848F351 /* ContentView.swift */; };
 		5946473658D2832693AAD626 /* MarkdownDocumentEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AADB61E8C71AD537BBF32B1 /* MarkdownDocumentEntity.swift */; };
@@ -20,6 +21,7 @@
 		B950EB53746D9F82824BEEA8 /* PreviewMarkdownSnippetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC865409FE7B7ACB46276F9E /* PreviewMarkdownSnippetIntent.swift */; };
 		D3A0A92C4C86CC6AF4108B01 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 30879589466FE04976BB07BF /* Assets.xcassets */; };
 		DC9DA962F665F1AB75A08732 /* MarkdownDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2125F230C5E1C232E71B6630 /* MarkdownDocument.swift */; };
+		E2511E046098EE090FBCA18C /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 46BD34534D57F75982EC88B7 /* MarkdownUI */; };
 		EC0AFD11FA214AAD2F053081 /* MarkdownSnippetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC87FFF311C44825BE8C50F /* MarkdownSnippetApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +34,7 @@
 		4608603E284680EC448C3EC5 /* MarkdownEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownEditorView.swift; sourceTree = "<group>"; };
 		4BC87FFF311C44825BE8C50F /* MarkdownSnippetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSnippetApp.swift; sourceTree = "<group>"; };
 		6C903C5C6823E5B55848F351 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		717A277617C0FF78236A22A2 /* MarkdownRenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderView.swift; sourceTree = "<group>"; };
 		ADBC4104D2C4B2C65F3952F5 /* PreviewMarkdownIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMarkdownIntent.swift; sourceTree = "<group>"; };
 		DBCD174740B834C2DA908745 /* MarkdownPreviewSnippetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownPreviewSnippetView.swift; sourceTree = "<group>"; };
 		E68B8DDC433685009468BDA4 /* FindDocumentIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindDocumentIntent.swift; sourceTree = "<group>"; };
@@ -40,6 +43,17 @@
 		F6C0B63C0E83E52A7AB72C5A /* MarkdownSnippet.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MarkdownSnippet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB82460CEAA1E9E0BE809552 /* ConvertMarkdownIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertMarkdownIntent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F4CAEF97FF64682AB7C57C12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2511E046098EE090FBCA18C /* MarkdownUI in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		06521B9235CD3F7DCC2595F2 /* Intents */ = {
@@ -107,6 +121,7 @@
 				6C903C5C6823E5B55848F351 /* ContentView.swift */,
 				4608603E284680EC448C3EC5 /* MarkdownEditorView.swift */,
 				DBCD174740B834C2DA908745 /* MarkdownPreviewSnippetView.swift */,
+				717A277617C0FF78236A22A2 /* MarkdownRenderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -120,6 +135,7 @@
 			buildPhases = (
 				1CACABB819A1D7575D52CAD3 /* Sources */,
 				C8F134A1F09C977A211D264B /* Resources */,
+				F4CAEF97FF64682AB7C57C12 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -127,6 +143,7 @@
 			);
 			name = MarkdownSnippet;
 			packageProductDependencies = (
+				46BD34534D57F75982EC88B7 /* MarkdownUI */,
 			);
 			productName = MarkdownSnippet;
 			productReference = F6C0B63C0E83E52A7AB72C5A /* MarkdownSnippet.app */;
@@ -156,6 +173,9 @@
 			);
 			mainGroup = BDE95B4E67ECEDE2E42FD02D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C59F60523B47326B3CF3BB28 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
@@ -189,6 +209,7 @@
 				5946473658D2832693AAD626 /* MarkdownDocumentEntity.swift in Sources */,
 				444EBEBD24BF91F13E3CD73A /* MarkdownEditorView.swift in Sources */,
 				05D238A8AD4211FE2263CD93 /* MarkdownPreviewSnippetView.swift in Sources */,
+				380AE5AC496FBBCCF95ACE8C /* MarkdownRenderView.swift in Sources */,
 				EC0AFD11FA214AAD2F053081 /* MarkdownSnippetApp.swift in Sources */,
 				2B3B7A1E48687FD6905FE269 /* MarkdownSnippetShortcuts.swift in Sources */,
 				A1A76623251C95D423FA086E /* OpenInAppIntent.swift in Sources */,
@@ -397,6 +418,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C59F60523B47326B3CF3BB28 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		46BD34534D57F75982EC88B7 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C59F60523B47326B3CF3BB28 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3A736CC504D4CA2AC86FC0D0 /* Project object */;
 }

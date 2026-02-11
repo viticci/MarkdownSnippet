@@ -17,19 +17,11 @@ struct MarkdownPreviewSnippetView: View {
 
             Divider()
 
-            if let attributed = try? AttributedString(
-                markdown: markdown,
-                options: .init(interpretedSyntax: .full)
-            ) {
-                Text(attributed)
-                    .font(.body)
-                    .lineSpacing(4)
+            ScrollView {
+                MarkdownRenderView(markdown: markdown, compact: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                Text(markdown)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
             }
+            .frame(maxHeight: 320)
 
             Divider()
 
@@ -43,7 +35,7 @@ struct MarkdownPreviewSnippetView: View {
 
                 Spacer()
 
-                Button(intent: OpenInAppIntent()) {
+                Button(intent: OpenInAppIntent(markdown: markdown)) {
                     Label("Open in App", systemImage: "arrow.up.forward.app")
                         .font(.caption)
                         .fontWeight(.medium)

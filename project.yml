@@ -11,12 +11,20 @@ settings:
     SWIFT_VERSION: "6.0"
     ENABLE_USER_SCRIPT_SANDBOXING: "YES"
 
+packages:
+  MarkdownUI:
+    url: https://github.com/gonzalezreal/swift-markdown-ui
+    from: 2.4.1
+
 targets:
   MarkdownSnippet:
     type: application
     platform: iOS
     sources:
       - MarkdownSnippet
+    dependencies:
+      - package: MarkdownUI
+        product: MarkdownUI
     settings:
       base:
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"

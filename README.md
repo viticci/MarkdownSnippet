@@ -1,172 +1,153 @@
 # MarkdownSnippet
 
-MarkdownSnippet is an iOS/iPadOS app that renders Markdown as rich text and exposes that rendering through App Intents, including interactive snippet views for Shortcuts.
+MarkdownSnippet is an iOS/iPadOS app + App Intents toolkit for rendering Markdown in Shortcuts snippet views and in a native editor app.
 
-The core flow:
+It is designed for the iOS 26/iPadOS 26 App Intents snippet workflow:
 
-1. Run `Preview Markdown` from Shortcuts.
-2. Pass Markdown text as input.
-3. See a rendered interactive snippet with actions to copy rich text or open the app.
+1. A shortcut sends Markdown text into `Preview Markdown`.
+2. The app returns an interactive snippet with rendered output.
+3. Snippet actions let you copy rich text (RTF) or create/open a document in the app.
 
-## Features
+## What It Supports
 
-- Markdown editor with local document storage (SwiftData).
-- In-app preview mode powered by `AttributedString(markdown:options:)`.
-- App Intents integration for Shortcuts.
-- Interactive snippet UI using `SnippetIntent`.
-- Snippet actions using `Button(intent:)`:
+- Headings, paragraphs, links, emphasis, code blocks.
+- Remote images rendered in preview.
+- GitHub-flavored Markdown tables (horizontally scrollable in compact snippet UI).
+- In-app document editing and preview with local SwiftData storage.
+- App Intents + snippet actions:
+  - `Preview Markdown`
+  - `Find Markdown Document`
   - `Copy as Rich Text`
   - `Open in MarkdownSnippet`
-- Document entity lookup via `Find Markdown Document`.
+
+## Markdown Engine Choice
+
+Markdown rendering uses [`swift-markdown-ui`](https://github.com/gonzalezreal/swift-markdown-ui), not `AttributedString(markdown:)`.
+
+Why:
+
+- Better Markdown fidelity for block layout (headings/paragraph spacing).
+- GitHub-flavored Markdown support, including table parsing/rendering.
+- Native SwiftUI theming/styling hooks for compact snippet constraints.
+- Built on `swift-cmark` + GFM extensions.
 
 ## Tech Stack
 
 - Swift 6
 - SwiftUI
 - SwiftData
-- App Intents (`AppIntent`, `SnippetIntent`, `AppEntity`, `AppShortcutsProvider`)
-- XcodeGen for project generation
+- App Intents + SnippetIntent APIs
+- XcodeGen
+- `swift-markdown-ui` package dependency
 
 ## Requirements
 
 - macOS with Xcode 26+
-- iOS/iPadOS 26.0+ deployment target
-- `xcodegen` installed
-- Optional: GitHub CLI (`gh`) for repo automation
+- iOS/iPadOS deployment target: 26.0
+- Homebrew + `xcodegen`
 
-Install XcodeGen if needed:
+Install XcodeGen:
 
 ```bash
 brew install xcodegen
 ```
 
-## Project Structure
+## Project Layout
 
 ```text
 MarkdownSnippet/
 ├── MarkdownSnippet/
 │   ├── AppShortcuts/
-│   │   └── MarkdownSnippetShortcuts.swift
-│   ├── Intents/
-│   │   ├── ConvertMarkdownIntent.swift
-│   │   ├── CopyRichTextIntent.swift
-│   │   ├── FindDocumentIntent.swift
-│   │   ├── OpenInAppIntent.swift
-│   │   ├── PreviewMarkdownIntent.swift
-│   │   └── PreviewMarkdownSnippetIntent.swift
-│   ├── Models/
-│   │   ├── MarkdownDocument.swift
-│   │   └── MarkdownDocumentEntity.swift
-│   ├── Views/
-│   │   ├── ContentView.swift
-│   │   ├── MarkdownEditorView.swift
-│   │   └── MarkdownPreviewSnippetView.swift
 │   ├── Assets.xcassets/
+│   ├── Intents/
+│   ├── Models/
+│   ├── Views/
 │   └── MarkdownSnippetApp.swift
-├── MarkdownSnippet.xcodeproj/
+├── ICON_COMPOSER_NOTES.md
 ├── project.yml
 └── README.md
 ```
 
 ## Build From Source
 
-1. Clone the repository:
-
 ```bash
 git clone https://github.com/viticci/MarkdownSnippet.git
 cd MarkdownSnippet
-```
-
-2. Generate the Xcode project:
-
-```bash
 xcodegen generate
-```
-
-3. Open the project:
-
-```bash
 open MarkdownSnippet.xcodeproj
 ```
 
-4. In Xcode, select the `MarkdownSnippet` scheme and build.
+Then select scheme `MarkdownSnippet` in Xcode and build.
 
-## Install on iOS and iPadOS (Device)
-
-1. Connect your iPhone or iPad to your Mac.
-2. Open `MarkdownSnippet.xcodeproj` in Xcode.
-3. Select the `MarkdownSnippet` target.
-4. In **Signing & Capabilities**:
-   - Choose your Apple Developer team.
-   - If needed, change bundle identifier to a unique value (for example `com.yourname.MarkdownSnippet`).
-5. Select your physical device as the run destination.
-6. Press `Cmd+R` to build and install.
-7. If prompted on device, enable Developer Mode:
-   - **Settings > Privacy & Security > Developer Mode**.
-8. If app trust is required:
-   - **Settings > General > VPN & Device Management** and trust the developer app certificate.
-
-## Run in Simulator
+### CLI Build Check
 
 ```bash
 xcodebuild -project MarkdownSnippet.xcodeproj \
   -scheme MarkdownSnippet \
+  -configuration Debug \
   -destination 'generic/platform=iOS Simulator' \
   build
 ```
 
-## Using the App
+## Install on iOS and iPadOS
 
-1. Launch **MarkdownSnippet**.
-2. Tap `+` to create a document.
-3. Edit Markdown in the text editor.
-4. Tap the eye icon to toggle preview.
+Use this exact flow for iPhone and iPad:
 
-## Using Shortcuts
+1. Connect the device to your Mac (USB or trusted network pairing).
+2. Run:
+   ```bash
+   xcodegen generate
+   open MarkdownSnippet.xcodeproj
+   ```
+3. In Xcode, select target `MarkdownSnippet`.
+4. Open **Signing & Capabilities**:
+   - Set your Team.
+   - If required, set a unique bundle ID (example: `com.yourname.MarkdownSnippet`).
+5. Select your physical iPhone/iPad as the run destination.
+6. Press `Cmd+R` to build and install.
+7. On device, if prompted:
+   - Enable Developer Mode in **Settings > Privacy & Security > Developer Mode**.
+   - Trust the developer certificate in **Settings > General > VPN & Device Management**.
+8. Launch the app once on-device so Shortcuts can index intents.
 
-After installing and launching the app once, Shortcuts should index the app intents.
+## How Snippet Actions Work
 
-### Intent: `Preview Markdown`
+- `Copy Rich Text`:
+  - Converts Markdown to attributed text.
+  - Writes both `public.rtf` and UTF-8 plain text to pasteboard.
+  - Intended for pasting styled text into rich-text destinations.
+- `Open in App`:
+  - Creates a new local document from snippet Markdown.
+  - Uses the first non-empty line as title (leading `#` stripped), fallback `Imported Markdown`.
+  - Opens the app (`openAppWhenRun = true`).
 
-- Input: `Markdown Text` (`String`)
-- Output: Interactive snippet (`PreviewMarkdownSnippetIntent`)
-- Snippet actions:
-  - `Copy Rich Text` (copies RTF + plain text to clipboard)
-  - `Open in App` (opens MarkdownSnippet)
+## Responsive Rendering Notes
 
-### Intent: `Find Markdown Document`
+Snippet previews use a compact renderer profile:
 
-- Input: `MarkdownDocumentEntity`
-- Output: Interactive snippet preview of selected document content
+- Tightened heading and paragraph spacing for small windows.
+- Tables wrapped in horizontal scroll containers.
+- Table cells use compact typography/padding.
+- Images constrained and rounded with subtle borders.
+- Code blocks scroll horizontally when needed.
 
-### Intent: `Convert Markdown to Rich Text`
+This keeps rendering usable in narrow iPhone snippet surfaces.
 
-- Input: Markdown text
-- Output: converted plain-text representation and dialog status
+## Icon Asset Notes (Liquid Glass / Icon Composer)
 
-## Architecture Notes
-
-- `MarkdownSnippetApp` registers `DocumentStore` into `AppDependencyManager` so intents can resolve shared state via `@Dependency`.
-- `MarkdownDocument` is the SwiftData model.
-- `MarkdownDocumentEntity` + `MarkdownDocumentQuery` expose stored documents to App Intents.
-- `PreviewMarkdownIntent` returns `ShowsSnippetIntent` and launches `PreviewMarkdownSnippetIntent`.
-- `PreviewMarkdownSnippetIntent` returns `ShowsSnippetView` with `MarkdownPreviewSnippetView`.
-- Snippet interactivity is implemented with `Button(intent:)` only.
+- A PNG fallback app icon is included in `Assets.xcassets` for immediate builds.
+- Research + workflow notes for `.icon` assets are in `ICON_COMPOSER_NOTES.md`.
+- Recommended production path is to create/edit icons in Apple Icon Composer and import `.icon` into Xcode.
 
 ## Troubleshooting
 
-- Intents not visible in Shortcuts:
-  - Launch the app once after install.
-  - Rebuild and reinstall from Xcode.
-  - Reopen Shortcuts.
-- Signing errors:
-  - Ensure a valid Apple team is selected.
-  - Use a unique bundle ID.
-- Build issues after changes:
-  - Regenerate project with `xcodegen generate`.
-  - Clean build folder in Xcode (`Shift+Cmd+K`).
-
-## Status
-
-- Project generated via XcodeGen.
-- Verified build with Xcode 26 simulator target.
+- Intents not showing in Shortcuts:
+  - Open the app once after install.
+  - Reboot Shortcuts app.
+  - Rebuild/reinstall from Xcode.
+- Build issues after dependency changes:
+  - Run `xcodegen generate`.
+  - In Xcode: **Product > Clean Build Folder**.
+- Signing failures:
+  - Verify Team is selected.
+  - Ensure bundle ID is unique for your account.

@@ -1,6 +1,7 @@
 import AppIntents
 import Foundation
 import UIKit
+import UniformTypeIdentifiers
 
 struct CopyRichTextIntent: AppIntent {
     static let title: LocalizedStringResource = "Copy as Rich Text"
@@ -31,9 +32,14 @@ struct CopyRichTextIntent: AppIntent {
 
             let pasteboard = UIPasteboard.general
             if let rtfData {
-                pasteboard.setValue(rtfData, forPasteboardType: "public.rtf")
+                var item: [String: Any] = [
+                    UTType.utf8PlainText.identifier: Data(nsAttributed.string.utf8)
+                ]
+                item[UTType.rtf.identifier] = rtfData
+                pasteboard.setItems([item], options: [:])
+            } else {
+                pasteboard.string = nsAttributed.string
             }
-            pasteboard.string = nsAttributed.string
         }
 
         PreviewMarkdownSnippetIntent.reload()

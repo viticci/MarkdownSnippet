@@ -18,22 +18,9 @@ struct MarkdownEditorView: View {
 
             if showPreview {
                 ScrollView {
-                    if let attributed = try? AttributedString(
-                        markdown: document.content,
-                        options: .init(interpretedSyntax: .full)
-                    ) {
-                        Text(attributed)
-                            .font(.body)
-                            .lineSpacing(4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                    } else {
-                        Text(document.content)
-                            .font(.body)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                    }
+                    MarkdownRenderView(markdown: document.content)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
                 }
             } else {
                 TextEditor(text: $document.content)

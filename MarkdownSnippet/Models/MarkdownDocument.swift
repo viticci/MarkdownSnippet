@@ -48,4 +48,13 @@ final class DocumentStore: Sendable {
         )
         return try? getContainer().mainContext.fetch(descriptor).first
     }
+
+    @discardableResult
+    func createDocument(title: String, content: String) -> MarkdownDocument {
+        let context = getContainer().mainContext
+        let document = MarkdownDocument(title: title, content: content)
+        context.insert(document)
+        try? context.save()
+        return document
+    }
 }
