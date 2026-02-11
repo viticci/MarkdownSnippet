@@ -18,6 +18,8 @@ struct CopyRichTextIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
+        let pasteboard = UIPasteboard.general
+
         if let attributed = try? AttributedString(
             markdown: markdown,
             options: .init(interpretedSyntax: .full),
@@ -30,7 +32,6 @@ struct CopyRichTextIntent: AppIntent {
                 ]
             )
 
-            let pasteboard = UIPasteboard.general
             if let rtfData {
                 var item: [String: Any] = [
                     UTType.utf8PlainText.identifier: Data(nsAttributed.string.utf8)
@@ -40,6 +41,8 @@ struct CopyRichTextIntent: AppIntent {
             } else {
                 pasteboard.string = nsAttributed.string
             }
+        } else {
+            pasteboard.string = markdown
         }
 
         PreviewMarkdownSnippetIntent.reload()
