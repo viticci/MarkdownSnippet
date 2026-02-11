@@ -1,42 +1,46 @@
 import AppIntents
-import UIKit
 import Foundation
 
-/// Copies the given Markdown content as rich text (NSAttributedString) to the clipboard.
-/// Hidden from Shortcuts — only triggered via Button(intent:) inside the snippet view.
+#if canImport(UIKit)
+import UIKit
+#endif
+
 struct CopyRichTextIntent: AppIntent {
-
-    static let title: LocalizedStringResource = "Copy as Rich Text"
-    static let isDiscoverable: Bool = false
-
+    static let title: LocalizedStringResource = "Copy Rich Text"
+    static let description: IntentDescription = "Copy markdown as rich text to clipboard"
+    static var isDiscoverable: Bool { false }
+    
     @Parameter(title: "Markdown Text")
-    var markdownText: String
-
-    init() {}
-
-    init(markdown: String) {
-        self.markdownText = markdown
-    }
-
+    var markdown: String
+    
     @MainActor
     func perform() async throws -> some IntentResult {
+        // Convert markdown to AttributedString
         let options = AttributedString.MarkdownParsingOptions(
             interpretedSyntax: .full
         )
-
-        if let attributed = try? AttributedString(markdown: markdownText, options: options) {
-            let nsAttributed = NSAttributedString(attributed)
-            if let rtfData = try? nsAttributed.data(
-                from: NSRange(location: 0, length: nsAttributed.length),
-                documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]
-            ) {
-                UIPasteboard.general.setData(rtfData, forPasteboardType: "public.rtf")
+        
+        guard let attributed = try? AttributedString(markdown: markdown, options: options) else {
+            throw CopyError.conversionFailed
+        }
+        
+        #if canImport(UIKit)
+        // Convert to NSAttributedString for pasteboard
+        let nsAttributed = try NSAttributedString(attributed)
+        UIPasteboard.general.string = nsAttributed.string
+        #endif
+        
+        return .result(dialog: "Rich text copied to clipboard")
+    }
+    
+    enum CopyError: Error, CustomLocalizedStringResourceConvertible {
+        case conversionFailed
+        
+        var localizedStringResource: LocalizedStringResource {
+            switch self {
+            case .conversionFailed:
+                return "Failed to convert markdown to rich text"
             }
         }
-
-        // Refresh the snippet to give visual feedback
-        PreviewMarkdownSnippetIntent.reload()
-
-        return .result()
     }
 }

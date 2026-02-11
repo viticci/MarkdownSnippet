@@ -3,31 +3,21 @@ import SwiftData
 
 @Model
 final class MarkdownDocument {
-
-    @Attribute(.unique)
-    var id: UUID
-
+    @Attribute(.unique) var id: String
     var title: String
     var content: String
     var createdAt: Date
     var modifiedAt: Date
-
-    init(
-        id: UUID = UUID(),
-        title: String = "Untitled",
-        content: String = "",
-        createdAt: Date = .now,
-        modifiedAt: Date = .now
-    ) {
+    
+    init(id: String = UUID().uuidString, title: String, content: String) {
         self.id = id
         self.title = title
         self.content = content
-        self.createdAt = createdAt
-        self.modifiedAt = modifiedAt
+        self.createdAt = Date()
+        self.modifiedAt = Date()
     }
-
-    /// First 140 characters of the content, suitable for display representations.
+    
     var preview: String {
-        String(content.prefix(140))
+        String(content.prefix(200))
     }
 }

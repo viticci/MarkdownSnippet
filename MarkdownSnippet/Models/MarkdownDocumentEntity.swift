@@ -1,62 +1,60 @@
+import Foundation
 import AppIntents
 import SwiftData
-import Foundation
 
 struct MarkdownDocumentEntity: AppEntity {
-
     static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Markdown Document")
     static let defaultQuery = MarkdownDocumentQuery()
-
+    
     let id: String
     let title: String
     let content: String
+    let preview: String
     let modifiedAt: Date
-
+    
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
             title: "\(title)",
-            subtitle: "\(String(content.prefix(80)))"
+            subtitle: "\(preview)"
         )
+    }
+    
+    init(from document: MarkdownDocument) {
+        self.id = document.id
+        self.title = document.title
+        self.content = document.content
+        self.preview = document.preview
+        self.modifiedAt = document.modifiedAt
     }
 }
 
-// MARK: - Entity Query
-
 struct MarkdownDocumentQuery: EntityQuery {
-
-    @Dependency
-    private var modelContainer: ModelContainer
-
+    @MainActor
     func entities(for identifiers: [String]) async throws -> [MarkdownDocumentEntity] {
-        let context = ModelContext(modelContainer)
-        let descriptor = FetchDescriptor<MarkdownDocument>()
+        let context = try getModelContext()
+        let descriptor = FetchDescriptor<MarkdownDocument>(
+            predicate: #Predicate { document in
+                identifiers.contains(document.id)
+            }
+        )
         let documents = try context.fetch(descriptor)
-        let idSet = Set(identifiers)
-        return documents
-            .filter { idSet.contains($0.id.uuidString) }
-            .map { $0.toEntity() }
+        return documents.map { MarkdownDocumentEntity(from: $0) }
     }
-
+    
+    @MainActor
     func suggestedEntities() async throws -> [MarkdownDocumentEntity] {
-        let context = ModelContext(modelContainer)
+        let context = try getModelContext()
         var descriptor = FetchDescriptor<MarkdownDocument>(
             sortBy: [SortDescriptor(\.modifiedAt, order: .reverse)]
         )
-        descriptor.fetchLimit = 20
+        descriptor.fetchLimit = 10
         let documents = try context.fetch(descriptor)
-        return documents.map { $0.toEntity() }
+        return documents.map { MarkdownDocumentEntity(from: $0) }
     }
-}
-
-// MARK: - Convenience
-
-extension MarkdownDocument {
-    func toEntity() -> MarkdownDocumentEntity {
-        MarkdownDocumentEntity(
-            id: id.uuidString,
-            title: title,
-            content: content,
-            modifiedAt: modifiedAt
-        )
+    
+    @MainActor
+    private func getModelContext() throws -> ModelContext {
+        let container = try ModelContainer(for: MarkdownDocument.self)
+        return ModelContext(container)
     }
 }

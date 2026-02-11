@@ -2,54 +2,30 @@ import SwiftUI
 import SwiftData
 
 struct MarkdownEditorView: View {
-
-    @Bindable var document: MarkdownDocument
     @Environment(\.modelContext) private var modelContext
-    @State private var showingPreview = false
-
-    private var renderedMarkdown: AttributedString {
-        let options = AttributedString.MarkdownParsingOptions(
-            interpretedSyntax: .full
-        )
-        return (try? AttributedString(markdown: document.content, options: options))
-            ?? AttributedString(document.content)
-    }
-
+    @Bindable var document: MarkdownDocument
+    
+    @State private var showPreview = false
+    @State private var attributedPreview: AttributedString?
+    
     var body: some View {
         VStack(spacing: 0) {
-            // Title field
-            TextField("Title", text: $document.title)
-                .font(.title2.weight(.semibold))
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .onChange(of: document.title) {
-                    document.modifiedAt = .now
+            if showPreview {
+                // Split view with editor and preview
+                HStack(spacing: 0) {
+                    // Editor
+                    editorView
+                        .frame(maxWidth: .infinity)
+                    
+                    Divider()
+                    
+                    // Preview
+                    previewView
+                        .frame(maxWidth: .infinity)
                 }
-
-            Divider()
-                .padding(.top, 8)
-
-            if showingPreview {
-                // MARK: Preview Mode
-                ScrollView {
-                    Text(renderedMarkdown)
-                        .font(.body)
-                        .lineSpacing(4)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                }
-                .transition(.move(edge: .trailing))
             } else {
-                // MARK: Editor Mode
-                TextEditor(text: $document.content)
-                    .font(.system(.body, design: .monospaced))
-                    .scrollContentBackground(.hidden)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .onChange(of: document.content) {
-                        document.modifiedAt = .now
-                    }
-                    .transition(.move(edge: .leading))
+                // Full editor
+                editorView
             }
         }
         .navigationTitle(document.title)
@@ -57,16 +33,89 @@ struct MarkdownEditorView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        showingPreview.toggle()
-                    }
+                    showPreview.toggle()
                 } label: {
-                    Image(systemName: showingPreview ? "pencil" : "eye")
+                    Label(
+                        showPreview ? "Hide Preview" : "Show Preview",
+                        systemImage: showPreview ? "eye.slash" : "eye"
+                    )
                 }
             }
         }
-        .onDisappear {
-            try? modelContext.save()
+        .onChange(of: document.content) { _, _ in
+            document.modifiedAt = Date()
+            updatePreview()
+        }
+        .task {
+            updatePreview()
         }
     }
+    
+    private var editorView: some View {
+        VStack(spacing: 0) {
+            // Title editor
+            TextField("Title", text: $document.title)
+                .font(.title2.bold())
+                .padding()
+                .background(Color(.systemBackground))
+            
+            Divider()
+            
+            // Content editor
+            TextEditor(text: $document.content)
+                .font(.body.monospaced())
+                .padding()
+        }
+    }
+    
+    private var previewView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if let attributed = attributedPreview {
+                    Text(attributed)
+                        .textSelection(.enabled)
+                } else {
+                    Text("Invalid markdown")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+        }
+        .background(Color(.secondarySystemBackground))
+    }
+    
+    private func updatePreview() {
+        Task {
+            let options = AttributedString.MarkdownParsingOptions(
+                interpretedSyntax: .full
+            )
+            attributedPreview = try? AttributedString(
+                markdown: document.content,
+                options: options
+            )
+        }
+    }
+}
+
+#Preview {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: MarkdownDocument.self, configurations: config)
+    let document = MarkdownDocument(
+        title: "Sample Document",
+        content: """
+        # Heading
+        
+        This is **bold** and *italic*.
+        
+        - List item
+        - Another item
+        """
+    )
+    container.mainContext.insert(document)
+    
+    return NavigationStack {
+        MarkdownEditorView(document: document)
+    }
+    .modelContainer(container)
 }

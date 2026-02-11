@@ -1,24 +1,16 @@
 import AppIntents
+import SwiftUI
 
-/// Main user-facing intent: takes markdown text and shows an interactive snippet preview.
 struct PreviewMarkdownIntent: AppIntent {
-
     static let title: LocalizedStringResource = "Preview Markdown"
-    static let description: IntentDescription = "Render Markdown text as a rich-text snippet with interactive actions."
-
-    @Parameter(title: "Markdown Text")
+    static let description: IntentDescription = "Preview markdown text as rendered rich text"
+    
+    @Parameter(title: "Markdown Text", description: "The markdown content to preview")
     var markdownText: String
-
-    init() {}
-
-    init(markdownText: String) {
-        self.markdownText = markdownText
-    }
-
-    @MainActor
-    func perform() async throws -> some IntentResult & OpensIntent {
-        let snippet = PreviewMarkdownSnippetIntent()
-        snippet.markdownText = markdownText
-        return .result(opensIntent: snippet)
+    
+    func perform() async throws -> some IntentResult & ShowsSnippetView {
+        return .result(
+            view: MarkdownPreviewSnippetView(markdown: markdownText)
+        )
     }
 }
