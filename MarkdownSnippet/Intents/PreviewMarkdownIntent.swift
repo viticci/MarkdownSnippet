@@ -14,8 +14,10 @@ struct PreviewMarkdownIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ShowsSnippetIntent {
+        let payloadID = PreviewMarkdownSnippetIntent.storeMarkdown(markdownText)
+
         return .result(
-            snippetIntent: PreviewMarkdownSnippetIntent(markdownText: markdownText)
+            snippetIntent: PreviewMarkdownSnippetIntent(payloadID: payloadID)
         )
     }
 }

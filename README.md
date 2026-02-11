@@ -1,35 +1,85 @@
 # MarkdownSnippet
 
-MarkdownSnippet is an iOS/iPadOS app + App Intents toolkit for rendering Markdown in Shortcuts snippet views and in a native editor app.
+MarkdownSnippet is an iOS/iPadOS app + App Intents toolkit for rendering Markdown inside Shortcuts snippets and in a native editor app.
 
-It is designed for the iOS 26/iPadOS 26 App Intents snippet workflow:
+## Current Status (February 11, 2026)
 
-1. A shortcut sends Markdown text into `Preview Markdown`.
-2. The app returns an interactive snippet with rendered output.
-3. Snippet actions let you copy rich text (RTF) or create/open a document in the app.
+The project is currently tuned around a real Shortcuts rendering bug observed on iOS 26.x where snippet previews could show a yellow highlight bar with a red prohibited glyph over rendered content.
 
-## What It Supports
+The current implementation keeps snippet rendering stable while preserving:
 
-- Headings, paragraphs, links, emphasis, code blocks.
-- Remote images rendered in preview.
-- GitHub-flavored Markdown tables (horizontally scrollable in compact snippet UI).
-- In-app document editing and preview with local SwiftData storage.
-- App Intents + snippet actions:
-  - `Preview Markdown`
-  - `Find Markdown Document`
-  - `Copy as Rich Text`
-  - `Open in MarkdownSnippet`
+- Rich Markdown rendering in the snippet (headings, links, images, tables, code blocks).
+- Responsive horizontal scrolling for Markdown tables.
+- Working snippet buttons (`Copy Rich Text`, `Open in App`).
+- Reliable clipboard writes from the snippet action.
 
-## Markdown Engine Choice
+## What Was Happening
 
-Markdown rendering uses [`swift-markdown-ui`](https://github.com/gonzalezreal/swift-markdown-ui), not `AttributedString(markdown:)`.
+Symptoms seen in Shortcuts snippet UI:
 
-Why:
+- Yellow horizontal artifact over preview text.
+- Red prohibited symbol in the highlighted area.
+- Behavior changed depending on markdown length and action state.
 
-- Better Markdown fidelity for block layout (headings/paragraph spacing).
-- GitHub-flavored Markdown support, including table parsing/rendering.
-- Native SwiftUI theming/styling hooks for compact snippet constraints.
-- Built on `swift-cmark` + GFM extensions.
+The issue appears to be in Shortcuts/snippet rendering state, not in markdown parsing itself.
+
+## Final Mitigation Strategy
+
+The current code uses a hybrid mitigation that keeps rich rendering and working buttons:
+
+- Snippet payload indirection:
+  - `PreviewMarkdownIntent` stores markdown in `UserDefaults` and passes only a payload ID to the snippet intent.
+  - This avoids passing large raw markdown directly in snippet intent parameters.
+- Aggressive input sanitization:
+  - Filters problematic scalars (format/private-use/control/illegal marker code points) before render/copy/open.
+- Rich snippet renderer with transparent text background:
+  - Uses `swift-markdown-ui` theme customization to avoid clashing background artifacts.
+- Copy action reliability + cache busting:
+  - Copy action now uses a renamed intent type (`CopyRichTextV2Intent`) and foreground run mode.
+  - This forces Shortcuts/App Intents re-indexing and improves clipboard reliability.
+
+## Copy Behavior
+
+`Copy Rich Text` now writes a multi-format pasteboard payload:
+
+- `public.rtf`
+- `public.html`
+- plain text (`public.plain-text` + UTF-8)
+
+Notes:
+
+- The destination app decides which representation to consume.
+- Some destinations may still flatten links/formatting on paste (app-specific behavior).
+- The app may foreground when copy runs (`openAppWhenRun = true`) to improve reliability.
+
+## Markdown Rendering Behavior
+
+- Snippet preview uses full markdown rendering (not plain text fallback by default).
+- Tables are rendered with horizontal scrolling.
+- Table rows are styled with alternating backgrounds.
+- Images are constrained and rounded.
+- Code blocks are horizontally scrollable.
+
+## Key Files
+
+- `MarkdownSnippet/Intents/PreviewMarkdownIntent.swift`
+- `MarkdownSnippet/Intents/PreviewMarkdownSnippetIntent.swift`
+- `MarkdownSnippet/Intents/CopyRichTextIntent.swift`
+- `MarkdownSnippet/Intents/OpenInAppIntent.swift`
+- `MarkdownSnippet/Models/MarkdownSanitizer.swift`
+- `MarkdownSnippet/Models/MarkdownRichText.swift`
+- `MarkdownSnippet/Views/MarkdownRenderView.swift`
+- `MarkdownSnippet/Views/MarkdownPreviewSnippetView.swift`
+- `MarkdownSnippet/Views/MarkdownSnapshotView.swift`
+
+## Troubleshooting (Shortcuts/App Intents Cache)
+
+If behavior looks stale after installing a new build:
+
+1. Launch `MarkdownSnippet` once manually.
+2. Force-quit Shortcuts and reopen.
+3. Re-run the shortcut.
+4. If still stale, remove and re-add the action in Shortcuts.
 
 ## Tech Stack
 
@@ -38,7 +88,7 @@ Why:
 - SwiftData
 - App Intents + SnippetIntent APIs
 - XcodeGen
-- `swift-markdown-ui` package dependency
+- `swift-markdown-ui` (`swift-cmark` GFM support)
 
 ## Requirements
 
@@ -89,65 +139,16 @@ xcodebuild -project MarkdownSnippet.xcodeproj \
   build
 ```
 
-## Install on iOS and iPadOS
+## Install on iPhone/iPad
 
-Use this exact flow for iPhone and iPad:
+1. Connect the device to your Mac.
+2. In Xcode, select target `MarkdownSnippet`.
+3. In Signing, set your Team and ensure bundle ID is valid for your account.
+4. Select the physical device as run destination.
+5. Build and run (`Cmd+R`).
+6. Launch the app once so Shortcuts can index intents.
 
-1. Connect the device to your Mac (USB or trusted network pairing).
-2. Run:
-   ```bash
-   xcodegen generate
-   open MarkdownSnippet.xcodeproj
-   ```
-3. In Xcode, select target `MarkdownSnippet`.
-4. Open **Signing & Capabilities**:
-   - Set your Team.
-   - If required, set a unique bundle ID (example: `com.yourname.MarkdownSnippet`).
-5. Select your physical iPhone/iPad as the run destination.
-6. Press `Cmd+R` to build and install.
-7. On device, if prompted:
-   - Enable Developer Mode in **Settings > Privacy & Security > Developer Mode**.
-   - Trust the developer certificate in **Settings > General > VPN & Device Management**.
-8. Launch the app once on-device so Shortcuts can index intents.
+## Icon Asset Notes
 
-## How Snippet Actions Work
-
-- `Copy Rich Text`:
-  - Converts Markdown to attributed text.
-  - Writes both `public.rtf` and UTF-8 plain text to pasteboard.
-  - Intended for pasting styled text into rich-text destinations.
-- `Open in App`:
-  - Creates a new local document from snippet Markdown.
-  - Uses the first non-empty line as title (leading `#` stripped), fallback `Imported Markdown`.
-  - Opens the app (`openAppWhenRun = true`).
-
-## Responsive Rendering Notes
-
-Snippet previews use a compact renderer profile:
-
-- Tightened heading and paragraph spacing for small windows.
-- Tables wrapped in horizontal scroll containers.
-- Table cells use compact typography/padding.
-- Images constrained and rounded with subtle borders.
-- Code blocks scroll horizontally when needed.
-
-This keeps rendering usable in narrow iPhone snippet surfaces.
-
-## Icon Asset Notes (Liquid Glass / Icon Composer)
-
-- A PNG fallback app icon is included in `Assets.xcassets` for immediate builds.
-- Research + workflow notes for `.icon` assets are in `ICON_COMPOSER_NOTES.md`.
-- Recommended production path is to create/edit icons in Apple Icon Composer and import `.icon` into Xcode.
-
-## Troubleshooting
-
-- Intents not showing in Shortcuts:
-  - Open the app once after install.
-  - Reboot Shortcuts app.
-  - Rebuild/reinstall from Xcode.
-- Build issues after dependency changes:
-  - Run `xcodegen generate`.
-  - In Xcode: **Product > Clean Build Folder**.
-- Signing failures:
-  - Verify Team is selected.
-  - Ensure bundle ID is unique for your account.
+- PNG fallback icon is included in `Assets.xcassets`.
+- Liquid Glass/Icon Composer workflow notes are in `ICON_COMPOSER_NOTES.md`.

@@ -16,17 +16,18 @@ struct MarkdownPreviewSnippetView: View {
             }
 
             Divider()
-
-            ScrollView {
-                MarkdownRenderView(markdown: markdown, compact: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(maxHeight: 320)
+            
+            MarkdownRenderView(
+                markdown: markdown,
+                compact: false,
+                transparentTextBackground: true
+            )
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Divider()
 
             HStack(spacing: 16) {
-                Button(intent: CopyRichTextIntent(markdown: markdown)) {
+                Button(intent: CopyRichTextV2Intent(markdown: markdown)) {
                     Label("Copy Rich Text", systemImage: "doc.on.doc")
                         .font(.caption)
                         .fontWeight(.medium)

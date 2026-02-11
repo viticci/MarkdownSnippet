@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,9 @@
 		4A3641A29ECB704BADF0CEDA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C903C5C6823E5B55848F351 /* ContentView.swift */; };
 		5946473658D2832693AAD626 /* MarkdownDocumentEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AADB61E8C71AD537BBF32B1 /* MarkdownDocumentEntity.swift */; };
 		6CC61CACC676BC17D2DA4AED /* ConvertMarkdownIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB82460CEAA1E9E0BE809552 /* ConvertMarkdownIntent.swift */; };
+		7A1B878B2F3CE76600BB8177 /* MarkdownSanitizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1B878A2F3CE76600BB8177 /* MarkdownSanitizer.swift */; };
+		7A1B878D2F3CE9E400BB8177 /* MarkdownRichText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1B878C2F3CE9E400BB8177 /* MarkdownRichText.swift */; };
+		7A1B878F2F3CEC4100BB8177 /* MarkdownSnapshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1B878E2F3CEC4100BB8177 /* MarkdownSnapshotView.swift */; };
 		7D49BA8BC27652D93C7D6E72 /* PreviewMarkdownIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADBC4104D2C4B2C65F3952F5 /* PreviewMarkdownIntent.swift */; };
 		8945E27EDF26CF9E94DFE9B2 /* FindDocumentIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68B8DDC433685009468BDA4 /* FindDocumentIntent.swift */; };
 		A1A76623251C95D423FA086E /* OpenInAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327128094185AFC52D540E11 /* OpenInAppIntent.swift */; };
@@ -35,12 +38,15 @@
 		4BC87FFF311C44825BE8C50F /* MarkdownSnippetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSnippetApp.swift; sourceTree = "<group>"; };
 		6C903C5C6823E5B55848F351 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		717A277617C0FF78236A22A2 /* MarkdownRenderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderView.swift; sourceTree = "<group>"; };
+		7A1B878A2F3CE76600BB8177 /* MarkdownSanitizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSanitizer.swift; sourceTree = "<group>"; };
+		7A1B878C2F3CE9E400BB8177 /* MarkdownRichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRichText.swift; sourceTree = "<group>"; };
+		7A1B878E2F3CEC4100BB8177 /* MarkdownSnapshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSnapshotView.swift; sourceTree = "<group>"; };
 		ADBC4104D2C4B2C65F3952F5 /* PreviewMarkdownIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMarkdownIntent.swift; sourceTree = "<group>"; };
 		DBCD174740B834C2DA908745 /* MarkdownPreviewSnippetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownPreviewSnippetView.swift; sourceTree = "<group>"; };
 		E68B8DDC433685009468BDA4 /* FindDocumentIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindDocumentIntent.swift; sourceTree = "<group>"; };
 		EC865409FE7B7ACB46276F9E /* PreviewMarkdownSnippetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewMarkdownSnippetIntent.swift; sourceTree = "<group>"; };
 		F1F18C21D8F018F895C61FD1 /* MarkdownSnippetShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownSnippetShortcuts.swift; sourceTree = "<group>"; };
-		F6C0B63C0E83E52A7AB72C5A /* MarkdownSnippet.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = MarkdownSnippet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F6C0B63C0E83E52A7AB72C5A /* MarkdownSnippet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarkdownSnippet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB82460CEAA1E9E0BE809552 /* ConvertMarkdownIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertMarkdownIntent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -95,6 +101,8 @@
 			children = (
 				2125F230C5E1C232E71B6630 /* MarkdownDocument.swift */,
 				3AADB61E8C71AD537BBF32B1 /* MarkdownDocumentEntity.swift */,
+				7A1B878A2F3CE76600BB8177 /* MarkdownSanitizer.swift */,
+				7A1B878C2F3CE9E400BB8177 /* MarkdownRichText.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -122,6 +130,7 @@
 				4608603E284680EC448C3EC5 /* MarkdownEditorView.swift */,
 				DBCD174740B834C2DA908745 /* MarkdownPreviewSnippetView.swift */,
 				717A277617C0FF78236A22A2 /* MarkdownRenderView.swift */,
+				7A1B878E2F3CEC4100BB8177 /* MarkdownSnapshotView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -157,11 +166,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
-				TargetAttributes = {
-					06ABC54457933CF0E6527704 = {
-						DevelopmentTeam = "";
-					};
-				};
 			};
 			buildConfigurationList = D10489CCE7D6EF5861D9DD58 /* Build configuration list for PBXProject "MarkdownSnippet" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -176,7 +180,6 @@
 			packageReferences = (
 				C59F60523B47326B3CF3BB28 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -211,10 +214,13 @@
 				05D238A8AD4211FE2263CD93 /* MarkdownPreviewSnippetView.swift in Sources */,
 				380AE5AC496FBBCCF95ACE8C /* MarkdownRenderView.swift in Sources */,
 				EC0AFD11FA214AAD2F053081 /* MarkdownSnippetApp.swift in Sources */,
+				7A1B878B2F3CE76600BB8177 /* MarkdownSanitizer.swift in Sources */,
 				2B3B7A1E48687FD6905FE269 /* MarkdownSnippetShortcuts.swift in Sources */,
 				A1A76623251C95D423FA086E /* OpenInAppIntent.swift in Sources */,
 				7D49BA8BC27652D93C7D6E72 /* PreviewMarkdownIntent.swift in Sources */,
 				B950EB53746D9F82824BEEA8 /* PreviewMarkdownSnippetIntent.swift in Sources */,
+				7A1B878D2F3CE9E400BB8177 /* MarkdownRichText.swift in Sources */,
+				7A1B878F2F3CEC4100BB8177 /* MarkdownSnapshotView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,10 +296,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4W35M4UN6R;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -317,10 +325,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4W35M4UN6R;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

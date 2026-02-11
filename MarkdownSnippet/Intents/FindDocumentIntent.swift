@@ -14,8 +14,9 @@ struct FindDocumentIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ShowsSnippetIntent {
+        let payloadID = PreviewMarkdownSnippetIntent.storeMarkdown(document.content)
         return .result(
-            snippetIntent: PreviewMarkdownSnippetIntent(markdownText: document.content)
+            snippetIntent: PreviewMarkdownSnippetIntent(payloadID: payloadID)
         )
     }
 }
