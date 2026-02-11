@@ -4,33 +4,34 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \MarkdownDocument.modifiedAt, order: .reverse) private var documents: [MarkdownDocument]
-    
-    @State private var showingEditor = false
-    @State private var selectedDocument: MarkdownDocument?
-    
+
     var body: some View {
         NavigationStack {
             Group {
                 if documents.isEmpty {
-                    ContentUnavailableView(
-                        "No Documents",
-                        systemImage: "doc.text",
-                        description: Text("Create a new markdown document to get started")
-                    )
+                    ContentUnavailableView {
+                        Label("No Documents", systemImage: "doc.richtext")
+                    } description: {
+                        Text("Create a Markdown document or use the Preview Markdown shortcut.")
+                    } actions: {
+                        Button("New Document") {
+                            createDocument()
+                        }
+                    }
                 } else {
                     List {
-                        ForEach(documents) { document in
-                            NavigationLink(destination: MarkdownEditorView(document: document)) {
+                        ForEach(documents) { doc in
+                            NavigationLink(destination: MarkdownEditorView(document: doc)) {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(document.title)
+                                    Text(doc.title)
                                         .font(.headline)
-                                    
-                                    Text(document.preview)
+
+                                    Text(doc.content.prefix(80))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                         .lineLimit(2)
-                                    
-                                    Text(document.modifiedAt, style: .relative)
+
+                                    Text(doc.modifiedAt, style: .relative)
                                         .font(.caption2)
                                         .foregroundStyle(.tertiary)
                                 }
@@ -41,38 +42,28 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Markdown Snippets")
+            .navigationTitle("MarkdownSnippet")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        createNewDocument()
-                    } label: {
-                        Label("New Document", systemImage: "plus")
+                    Button(action: createDocument) {
+                        Image(systemName: "plus")
                     }
                 }
             }
         }
     }
-    
-    private func createNewDocument() {
-        let document = MarkdownDocument(
-            title: "Untitled",
-            content: "# New Document\n\nStart writing your markdown here..."
+
+    private func createDocument() {
+        let doc = MarkdownDocument(
+            title: "New Document",
+            content: "# Hello\n\nStart writing **Markdown** here."
         )
-        modelContext.insert(document)
-        try? modelContext.save()
+        modelContext.insert(doc)
     }
-    
+
     private func deleteDocuments(at offsets: IndexSet) {
         for index in offsets {
-            let document = documents[index]
-            modelContext.delete(document)
+            modelContext.delete(documents[index])
         }
-        try? modelContext.save()
     }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: MarkdownDocument.self, inMemory: true)
 }

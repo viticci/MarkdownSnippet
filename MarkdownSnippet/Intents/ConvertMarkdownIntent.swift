@@ -3,31 +3,25 @@ import Foundation
 
 struct ConvertMarkdownIntent: AppIntent {
     static let title: LocalizedStringResource = "Convert Markdown to Rich Text"
-    static let description: IntentDescription = "Convert markdown text to rich text output"
-    
-    @Parameter(title: "Markdown Text", description: "The markdown content to convert")
+    static let description: IntentDescription = "Converts Markdown text into rich text."
+
+    @Parameter(title: "Markdown Text")
     var markdownText: String
-    
-    func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        let options = AttributedString.MarkdownParsingOptions(
-            interpretedSyntax: .full
-        )
-        
-        guard let attributed = try? AttributedString(markdown: markdownText, options: options) else {
-            throw ConversionError.failed
-        }
-        
-        // Return plain text version of attributed string
-        let plainText = String(attributed.characters)
-        
-        return .result(value: plainText)
+
+    init() {}
+
+    init(markdownText: String) {
+        self.markdownText = markdownText
     }
-    
-    enum ConversionError: Error, CustomLocalizedStringResourceConvertible {
-        case failed
-        
-        var localizedStringResource: LocalizedStringResource {
-            "Failed to convert markdown"
+
+    func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
+        if let attributed = try? AttributedString(
+            markdown: markdownText,
+            options: .init(interpretedSyntax: .full)
+        ) {
+            let plainText = String(attributed.characters)
+            return .result(value: plainText, dialog: "Converted Markdown to rich text.")
         }
+        return .result(value: markdownText, dialog: "Could not parse Markdown.")
     }
 }

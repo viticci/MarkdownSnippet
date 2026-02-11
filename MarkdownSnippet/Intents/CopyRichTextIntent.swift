@@ -1,46 +1,43 @@
 import AppIntents
 import Foundation
-
-#if canImport(UIKit)
 import UIKit
-#endif
 
 struct CopyRichTextIntent: AppIntent {
-    static let title: LocalizedStringResource = "Copy Rich Text"
-    static let description: IntentDescription = "Copy markdown as rich text to clipboard"
-    static var isDiscoverable: Bool { false }
-    
-    @Parameter(title: "Markdown Text")
+    static let title: LocalizedStringResource = "Copy as Rich Text"
+    static let isDiscoverable: Bool = false
+
+    @Parameter(title: "Markdown")
     var markdown: String
-    
-    @MainActor
-    func perform() async throws -> some IntentResult {
-        // Convert markdown to AttributedString
-        let options = AttributedString.MarkdownParsingOptions(
-            interpretedSyntax: .full
-        )
-        
-        guard let attributed = try? AttributedString(markdown: markdown, options: options) else {
-            throw CopyError.conversionFailed
-        }
-        
-        #if canImport(UIKit)
-        // Convert to NSAttributedString for pasteboard
-        let nsAttributed = try NSAttributedString(attributed)
-        UIPasteboard.general.string = nsAttributed.string
-        #endif
-        
-        return .result(dialog: "Rich text copied to clipboard")
+
+    init() {}
+
+    init(markdown: String) {
+        self.markdown = markdown
     }
-    
-    enum CopyError: Error, CustomLocalizedStringResourceConvertible {
-        case conversionFailed
-        
-        var localizedStringResource: LocalizedStringResource {
-            switch self {
-            case .conversionFailed:
-                return "Failed to convert markdown to rich text"
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        if let attributed = try? AttributedString(
+            markdown: markdown,
+            options: .init(interpretedSyntax: .full),
+        ) {
+            let nsAttributed = NSAttributedString(attributed)
+            let rtfData = try? nsAttributed.data(
+                from: NSRange(location: 0, length: nsAttributed.length),
+                documentAttributes: [
+                    NSAttributedString.DocumentAttributeKey.documentType: NSAttributedString.DocumentType.rtf
+                ]
+            )
+
+            let pasteboard = UIPasteboard.general
+            if let rtfData {
+                pasteboard.setValue(rtfData, forPasteboardType: "public.rtf")
             }
+            pasteboard.string = nsAttributed.string
         }
+
+        PreviewMarkdownSnippetIntent.reload()
+
+        return .result(dialog: "Copied to clipboard as rich text.")
     }
 }

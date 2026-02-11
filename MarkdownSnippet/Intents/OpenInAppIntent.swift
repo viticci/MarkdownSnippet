@@ -1,17 +1,11 @@
 import AppIntents
-import Foundation
 
 struct OpenInAppIntent: AppIntent {
-    static let title: LocalizedStringResource = "Open in App"
-    static let description: IntentDescription = "Open MarkdownSnippet app"
-    static var isDiscoverable: Bool { false }
-    
-    @Parameter(title: "Markdown Text", default: "")
-    var markdown: String?
-    
-    @MainActor
-    func perform() async throws -> some IntentResult & OpensIntent {
-        // This will open the app
+    static let title: LocalizedStringResource = "Open in MarkdownSnippet"
+    static let isDiscoverable: Bool = false
+    static let openAppWhenRun: Bool = true
+
+    func perform() async throws -> some IntentResult {
         return .result()
     }
 }

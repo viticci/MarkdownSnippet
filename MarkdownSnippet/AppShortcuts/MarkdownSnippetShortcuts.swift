@@ -16,21 +16,11 @@ struct MarkdownSnippetShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: FindDocumentIntent(),
             phrases: [
-                "Find markdown document in \(.applicationName)",
-                "Open document in \(.applicationName)"
+                "Find document in \(.applicationName)",
+                "Open a document from \(.applicationName)"
             ],
             shortTitle: "Find Document",
             systemImageName: "magnifyingglass"
-        )
-        
-        AppShortcut(
-            intent: ConvertMarkdownIntent(),
-            phrases: [
-                "Convert markdown with \(.applicationName)",
-                "Transform markdown using \(.applicationName)"
-            ],
-            shortTitle: "Convert Markdown",
-            systemImageName: "arrow.2.squarepath"
         )
     }
 }
